@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>天下何往 · 1895-1921</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --ink:#1a1612;
+    --paper:#f4ecd8;
+    --paper-dark:#e8dcc0;
+    --vermilion:#a02828;
+    --vermilion-light:#c44d4d;
+    --gold:#b89456;
+    --muted:#8a7e6e;
+  }
+  body{
+    font-family:'KaiTi','STKaiti','楷体',serif;
+    background:var(--ink);
+    color:var(--paper);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background-image:
+      radial-gradient(ellipse at 20% 30%,rgba(160,40,40,.08),transparent 50%),
+      radial-gradient(ellipse at 80% 70%,rgba(184,148,86,.06),transparent 50%);
+  }
+  .scroll{
+    width:100%;
+    max-width:680px;
+    background:linear-gradient(180deg,var(--paper) 0%,var(--paper-dark) 100%);
+    color:var(--ink);
+    border-radius:4px;
+    padding:48px 36px 40px;
+    box-shadow:0 8px 60px rgba(0,0,0,.5),inset 0 0 80px rgba(184,148,86,.08);
+    position:relative;
+    min-height:400px;
+  }
+  .scroll::before,.scroll::after{
+    content:'';
+    position:absolute;
+    left:0;right:0;
+    height:3px;
+    background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  }
+  .scroll::before{top:12px}
+  .scroll::after{bottom:12px}
+  .year-tag{
+    display:inline-block;
+    background:var(--vermilion);
+    color:var(--paper);
+    padding:4px 18px;
+    font-size:15px;
+    letter-spacing:3px;
+    margin-bottom:18px;
+    border-radius:2px;
+  }
+  .scene-title{
+    font-size:28px;
+    letter-spacing:6px;
+    color:var(--ink);
+    margin-bottom:20px;
+    font-weight:bold;
+    border-bottom:2px solid var(--vermilion);
+    padding-bottom:12px;
+    display:inline-block;
+  }
+  .scene-text{
+    font-size:17px;
+    line-height:2;
+    color:#3a3028;
+    margin-bottom:28px;
+    text-indent:2em;
+  }
+  .choice-list{display:flex;flex-direction:column;gap:12px}
+  .choice-btn{
+    background:transparent;
+    border:2px solid var(--muted);
+    color:var(--ink);
+    padding:14px 20px;
+    font-family:inherit;
+    font-size:16px;
+    cursor:pointer;
+    transition:all .3s ease;
+    text-align:left;
+    line-height:1.6;
+    border-radius:2px;
+  }
+  .choice-btn:hover{
+    border-color:var(--vermilion);
+    background:rgba(160,40,40,.05);
+    transform:translateX(6px);
+  }
+  .choice-btn .num{
+    color:var(--vermilion);
+    font-weight:bold;
+    margin-right:8px;
+  }
+  .result-box{animation:fadeIn .6s ease}
+  .result-detail{
+    font-size:17px;
+    line-height:2;
+    color:#3a3028;
+    margin-bottom:18px;
+    text-indent:2em;
+    padding:16px 20px;
+    background:rgba(160,40,40,.04);
+    border-left:3px solid var(--vermilion);
+  }
+  .result-history{
+    font-size:15px;
+    line-height:1.9;
+    color:var(--muted);
+    margin-bottom:28px;
+    padding:12px 18px;
+    border:1px dashed var(--gold);
+    border-radius:2px;
+  }
+  .result-history::before{
+    content:'史实';
+    display:inline-block;
+    background:var(--gold);
+    color:var(--paper);
+    font-size:13px;
+    padding:2px 10px;
+    margin-right:10px;
+    border-radius:2px;
+  }
+  .continue-btn{
+    display:block;
+    margin:0 auto;
+    background:var(--vermilion);
+    color:var(--paper);
+    border:none;
+    padding:12px 40px;
+    font-family:inherit;
+    font-size:16px;
+    letter-spacing:4px;
+    cursor:pointer;
+    border-radius:2px;
+    transition:background .3s;
+  }
+  .continue-btn:hover{background:var(--vermilion-light)}
+  .path-record{
+    margin:24px 0;
+    padding:20px;
+    background:rgba(184,148,86,.08);
+    border-radius:4px;
+  }
+  .path-record h3{
+    font-size:18px;
+    color:var(--vermilion);
+    margin-bottom:14px;
+    text-align:center;
+    letter-spacing:3px;
+  }
+  .path-item{
+    font-size:15px;
+    line-height:1.9;
+    color:#3a3028;
+    padding:6px 0;
+    border-bottom:1px dotted rgba(184,148,86,.3);
+  }
+  .path-item:last-child{border-bottom:none}
+  .path-item .label{color:var(--muted);font-size:13px}
+  .path-item .pick{color:var(--vermilion);font-weight:bold}
+  .ending-text{
+    font-size:18px;
+    line-height:2.2;
+    color:#3a3028;
+    text-indent:2em;
+    margin-bottom:18px;
+  }
+  .ending-quote{
+    font-size:20px;
+    color:var(--vermilion);
+    text-align:center;
+    letter-spacing:3px;
+    margin:24px 0;
+    font-weight:bold;
+  }
+  .progress{
+    display:flex;
+    gap:8px;
+    justify-content:center;
+    margin-bottom:20px;
+  }
+  .progress span{
+    width:36px;
+    height:4px;
+    background:rgba(184,148,86,.3);
+    border-radius:2px;
+    transition:background .4s;
+  }
+  .progress span.done{background:var(--vermilion)}
+  .progress span.current{background:var(--gold)}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  .fade-in{animation:fadeIn .5s ease}
+  .footer-hint{
+    text-align:center;
+    font-size:13px;
+    color:var(--muted);
+    margin-top:16px;
+    letter-spacing:2px;
+  }
+  @media(max-width:600px){
+    .scroll{padding:32px 20px 28px}
+    .scene-title{font-size:24px;letter-spacing:4px}
+    .scene-text,.result-detail,.ending-text{font-size:15px;line-height:1.9}
+    .choice-btn{font-size:14px;padding:12px 14px}
+  }
+</style>
+</head>
+<body>
+<div class="scroll" id="app"></div>
+<script>
+const scenes = {
+  intro:{
+    type:'choice',
+    year:'序章',
+    title:'天下何往',
+    text:'一八四〇年，鸦片战争，国门被炮火轰开。此后八十年，中华大地风雨飘摇，国家蒙辱、人民蒙难、文明蒙尘。你将化身一位身处乱局的青年，在历史的十字路口，做出你的选择。须知：每个抉择都没有标准答案，因为当时的人，并不知道未来。',
+    choices:[{text:'步入历史',next:'act1'}]
+  },
+  act1:{
+    type:'choice',
+    year:'一八九五年',
+    title:'甲午之痛',
+    text:'你今年十六岁，江南书香门第子弟。噩耗传来——北洋水师全军覆没，《马关条约》割让台湾、赔款两亿三千万两白银。天朝上国的迷梦，碎了。国难当头，你将何为？',
+    choices:[
+      {text:'上书维新——追随康有为梁启超，变法图强',next:'act1_a'},
+      {text:'投身革命——追随孙中山，推翻帝制',next:'act1_b'},
+      {text:'实业救国——效法张謇，办厂兴业',next:'act1_c'},
+      {text:'苦读科举——走仕途正道，求一官半职',next:'act1_d'}
+    ]
+  },
+  act1_a:{
+    type:'result',
+    year:'一八九五年',
+    title:'维新之路',
+    detail:'一八九八年，你随康梁上书，参与戊戌变法。变法推行一百零三日，慈禧发动政变，谭嗣同等六君子血洒菜市口。你侥幸逃脱，流亡海外，心如死灰。改良之路，走不通。',
+    history:'自上而下的改良，在封建顽固势力面前不堪一击。戊戌变法的失败证明：不推翻封建统治，靠君主自上而下变法，此路不通。',
+    next:'act2'
+  },
+  act1_b:{
+    type:'result',
+    year:'一八九五年',
+    title:'革命之路',
+    detail:'你加入同盟会，奔走呼号。一九一一年武昌起义，民国建立。然而很快袁世凯窃取果实，复辟帝制；其后军阀混战，民不聊生。你目睹共和沦为空壳，悲愤难言。',
+    history:'辛亥革命推翻了帝制，但没有改变中国半殖民地半封建的社会性质。旧民主主义革命未能完成反帝反封建的任务。',
+    next:'act2'
+  },
+  act1_c:{
+    type:'result',
+    year:'一八九五年',
+    title:'实业之路',
+    detail:'你效法张謇办起纱厂。一战期间列强无暇东顾，工厂短暂繁荣。战后列强卷土重来，军阀横征暴敛，原料被垄断，市场被倾销，工厂难以为继。你终于明白：制度不改，实业难救国。',
+    history:'实业救国反映了民族资产阶级的爱国心，但在半殖民地半封建的中国，不改变社会制度，实业无法救国。',
+    next:'act2'
+  },
+  act1_d:{
+    type:'result',
+    year:'一八九五年',
+    title:'科举之路',
+    detail:'你埋头苦读四书五经，求取功名。一九〇五年，清廷下诏废除科举。千年仕途一夜断绝，你的苦读化为泡影。旧制度，已走到尽头。',
+    history:'科举的废除标志着旧制度再无自我改良的余地。旧式读书人失去了出路，转而成为革命的潜在力量。',
+    next:'act2'
+  },
+  act2:{
+    type:'choice',
+    year:'一九一一年',
+    title:'共和迷梦',
+    text:'你已年过三十。辛亥革命推翻了皇帝，换来的却不是太平——军阀混战，民不聊生。共和国有了名，却没有实。面对这有名无实的共和，你将何为？',
+    choices:[
+      {text:'投身新文化——办刊物，启蒙思想',next:'act2_a'},
+      {text:'投身议会——组党参选，走宪政之路',next:'act2_b'},
+      {text:'苦闷迷茫——各种主义涌入，不知何去何从',next:'act2_c'}
+    ]
+  },
+  act2_a:{
+    type:'result',
+    year:'一九一一年',
+    title:'启蒙之路',
+    detail:'你与陈独秀们一道，创办刊物，高呼德先生与赛先生。思想启蒙了青年，旧礼教受到冲击。但你发现，思想启蒙了，旧社会依旧如铁屋。光有思想，不够。',
+    history:'新文化运动是一次伟大的思想启蒙，为马克思主义传播创造了条件。但仅靠思想启蒙，不能改变根本的社会制度。',
+    next:'act3'
+  },
+  act2_b:{
+    type:'result',
+    year:'一九一一年',
+    title:'议会之路',
+    detail:'你组党参选，走进议会。然而议员被军阀明码标价收买，"猪仔议员"横行。一次贿选，一番操纵，你辛苦经营的政党沦为军阀玩物。你愤而退出，心灰意冷。',
+    history:'在半殖民地半封建社会，议会道路走不通。没有真正的独立和民主制度，议会只是军阀的橡皮图章。',
+    next:'act3'
+  },
+  act2_c:{
+    type:'result',
+    year:'一九一一年',
+    title:'迷惘之路',
+    detail:'无政府主义、实用主义、自由主义、改良主义、社会达尔文主义……各种主义涌入中国，你逐一审视。然而无论哪一种，都没能真正解决中国的问题。你在苦闷中等待。',
+    history:'无论哪一种思潮、哪一种主义，都未能改变中国的命运。中国迫切需要新的思想引领救亡运动，迫切需要新的组织凝聚革命力量。',
+    next:'act3'
+  },
+  act3:{
+    type:'choice',
+    year:'一九一九年',
+    title:'新的曙光',
+    text:'你已近四十。巴黎和会外交失败，五四运动爆发，工人学生涌上街头。十月革命的炮声传来，一个崭新的主义出现在你面前。各种道路都已试过，这一次，你将何择？',
+    choices:[
+      {text:'研究马克思主义——读李大钊，看十月革命',next:'act3_a'},
+      {text:'选择无政府主义——追求绝对自由',next:'act3_b'},
+      {text:'跟随胡适——多研究问题，少谈主义',next:'act3_c'},
+      {text:'选择自由主义——追求西式民主',next:'act3_d'}
+    ]
+  },
+  act3_a:{
+    type:'result',
+    year:'一九一九年',
+    title:'真理之路',
+    detail:'你读到李大钊《我的马克思主义观》，看到"试看将来的环球，必是赤旗的世界"。你开始研究唯物史观、阶级斗争、剩余价值。你看到了一条从经济基础入手、发动底层劳苦大众、彻底改造社会的道路。这一次，希望在前方。',
+    history:'马克思主义为中国人民提供了科学的世界观和方法论。十月革命一声炮响，给我们送来了马克思列宁主义。五四运动促进了马克思主义在中国的传播。',
+    next:'act4'
+  },
+  act3_b:{
+    type:'result',
+    year:'一九一九年',
+    title:'空想之路',
+    detail:'无政府主义吸引了不少青年，反对一切强权、追求绝对自由。但它缺乏严密组织，无法凝聚革命力量；又反对一切国家机器，无法建立新政权。很快式微，你再次陷入迷茫。',
+    history:'无政府主义虽有进步因素，但无法承担中国革命的重任。没有坚强的组织和科学理论，理想只能是空想。',
+    next:'act4'
+  },
+  act3_c:{
+    type:'result',
+    year:'一九一九年',
+    title:'改良之路',
+    detail:'你跟随胡适，主张多研究问题、少谈主义。你逐一研究一个个具体问题——人力车夫、缠足、鸦片。但你发现：不触及根本制度，问题也解决不了。治标不治本，越治越绝望。',
+    history:'改良主义无法解决半殖民地半封建社会的根本矛盾。不改变根本制度，个别问题的改良难以奏效。',
+    next:'act4'
+  },
+  act3_d:{
+    type:'result',
+    year:'一九一九年',
+    title:'西化之路',
+    detail:'你向往西方的自由民主，组建自由主义团体。然而在军阀刺刀下，议会梦一次次碎裂。自由主义在半殖民地半封建的土壤里，始终无法扎根。你开始怀疑：照搬西方，行吗？',
+    history:'自由主义未能改变中国命运。在半殖民地半封建社会，照搬西方模式无法解决中国的问题。',
+    next:'act4'
+  },
+  act4:{
+    type:'ending',
+    year:'一九二一年',
+    title:'历史的抉择'
+  },
+  ending:{
+    type:'final'
+  }
+};
+
+let current = 'intro';
+let path = [];
+
+function render(){
+  const s = scenes[current];
+  const app = document.getElementById('app');
+  const actIndex = ['intro','act1','act2','act3','act4'].indexOf(current);
+  let progressHtml = '';
+  if(actIndex >= 0 && s.type !== 'ending' && s.type !== 'final'){
+    progressHtml = '<div class="progress">';
+    for(let i=0;i<5;i++){
+      let cls = i < actIndex ? 'done' : (i === actIndex ? 'current' : '');
+      progressHtml += '<span class="'+cls+'"></span>';
+    }
+    progressHtml += '</div>';
+  }
+
+  if(s.type === 'choice'){
+    let html = progressHtml;
+    html += '<div class="year-tag">'+s.year+'</div>';
+    html += '<div class="scene-title">'+s.title+'</div>';
+    html += '<div class="scene-text">'+s.text+'</div>';
+    html += '<div class="choice-list">';
+    s.choices.forEach((c,i)=>{
+      html += '<button class="choice-btn fade-in" onclick="choose('+i+')"><span class="num">'+String.fromCharCode(65+i)+'</span>'+c.text+'</button>';
+    });
+    html += '</div>';
+    html += '<div class="footer-hint">—— 每个选择都没有标准答案 ——</div>';
+    app.innerHTML = html;
+  } else if(s.type === 'result'){
+    let html = progressHtml;
+    html += '<div class="result-box fade-in">';
+    html += '<div class="year-tag">'+s.year+'</div>';
+    html += '<div class="scene-title">'+s.title+'</div>';
+    html += '<div class="result-detail">'+s.detail+'</div>';
+    html += '<div class="result-history">'+s.history+'</div>';
+    html += '<button class="continue-btn" onclick="next()">继续</button>';
+    html += '</div>';
+    app.innerHTML = html;
+  } else if(s.type === 'ending'){
+    let pathHtml = '<div class="path-record"><h3>你的抉择之路</h3>';
+    path.forEach((p,i)=>{
+      pathHtml += '<div class="path-item"><span class="label">'+p.act+'：</span><span class="pick">'+p.choice+'</span></div>';
+    });
+    pathHtml += '</div>';
+
+    let endingText = '<div class="ending-text">一九二一年，中国共产党应运而生。不是马克思主义一开始就最好，而是别的路都走过了，都走不通——</div>';
+    endingText += '<div class="ending-text">维新失败了。革命被窃取了。实业被扼杀了。科举被废除了。启蒙不够了。议会被操控了。各种主义，都未能解决中国的问题。</div>';
+    endingText += '<div class="ending-quote">正是八十年试错，把历史逼到这一步</div>';
+    endingText += '<div class="ending-text">只有马克思主义，只有中国共产党，才真正改变了中国的命运。这不是偶然，是历史的选择，是人民的选择。</div>';
+    endingText += '<div class="ending-text">此后，党把马克思主义同中国实际结合——新民主主义革命，站起来了；社会主义建设，基础奠定了；改革开放，富起来了；新时代，强起来了。这条路，叫马克思主义中国化时代化。</div>';
+    endingText += '<div class="ending-text">你要学的这门课，讲的就是这条路，是怎么走出来的。</div>';
+
+    let html = progressHtml;
+    html += '<div class="year-tag">'+s.year+'</div>';
+    html += '<div class="scene-title">'+s.title+'</div>';
+    html += pathHtml;
+    html += endingText;
+    html += '<button class="continue-btn" onclick="restart()">重走一遍</button>';
+    html += '<div class="footer-hint">—— 历史没有如果，但理解选择不易，才能读懂中国 ——</div>';
+    app.innerHTML = html;
+  }
+}
+
+function choose(i){
+  const s = scenes[current];
+  const c = s.choices[i];
+  path.push({act:s.title,choice:c.text.split('——')[0].trim()});
+  current = c.next;
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function next(){
+  const s = scenes[current];
+  current = s.next;
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function restart(){
+  current = 'intro';
+  path = [];
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
